@@ -1,48 +1,54 @@
-const { exec } = require('child_process');
-const { promisify } = require('util');
-const fs = require('fs').promises;
-const path = require('path');
-const os = require('os');
-const execAsync = promisify(exec);
+const OpenAI = require('openai');
 
 class GeminiAnalyzer {
   constructor() {
     this.defaultTimeout = 60000; // 60 seconds
+    this.openai = process.env.OPENAI_API_KEY
+      ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+      : null;
+    this.model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   }
 
   async analyzeYouTubeVideo(videoUrl, comments = [], wordCount = 200) {
-    const commentsText = comments.length > 0 
-      ? comments.map(c => `- ${c.text} (${c.likes || 0} likes)`).join('\n')
+    console.log('\n🎬 YOUTUBE ANALYZER CALLED:');
+    console.log(`   - Video URL: ${videoUrl}`);
+    console.log(`   - Comments count: ${comments.length}`);
+    console.log(`   - Word count: ${wordCount}`);
+
+    const commentsText = comments.length > 0
+      ? comments.map(c => `- ${c.text || c.body || ''} (${c.likes || c.score || 0} votes)`).join('\n')
       : 'No comments available';
 
-    const prompt = `Analyze this YouTube content in exactly ${wordCount} words:
+    console.log(`   - Comments text length: ${commentsText.length} chars`);
+
+    const prompt = `You are an expert content analyst. Analyze this YouTube content in approximately ${wordCount} words and use the exact headings below.
 
 VIDEO URL: ${videoUrl}
-(Note: Focus on analyzing the comments and inferring content type from URL patterns)
 
 TOP VIEWER COMMENTS:
 ${commentsText}
 
-Based on the comments and URL context, provide analysis in this format:
-**Summary:** [Inferred content type, likely topics, educational value, target audience]
-**Audience Reaction:** [Overall sentiment from comments - positive/negative/mixed with key themes]
+Respond in this exact format:
+**Summary:** <Inferred content type, key topics, educational value, target audience>
+**Audience Reaction:** <Overall sentiment based on comments (positive/negative/mixed) with key themes>`;
 
-Focus on what the comments reveal about the content and community reception.`;
+    console.log(`   - Final prompt length: ${prompt.length} chars`);
+    console.log('   🚀 Calling LLM API...\n');
 
-    return await this.callGeminiCLI(prompt);
+    return await this.callLLM(prompt);
   }
 
   async analyzeRedditPost(postData, wordCount = 150) {
     const { title, selftext, subreddit, score, upvoteRatio, comments = [], url } = postData;
-    
+
     const commentsText = comments.length > 0
-      ? comments.map(c => `- ${c.body} (${c.score} points)`).join('\n')
+      ? comments.map(c => `- ${c.body || c.text || ''} (${c.score || c.likes || 0} votes)`).join('\n')
       : 'No comments available';
 
     const contentType = url && !url.includes('reddit.com') ? 'LINK POST' : 'TEXT POST';
     const content = selftext || `External link: ${url}`;
 
-    const prompt = `Analyze this Reddit discussion in exactly ${wordCount} words:
+    const prompt = `You are an expert discussion analyst. Analyze this Reddit discussion in approximately ${wordCount} words and use the exact headings below.
 
 ${contentType}: r/${subreddit}
 Title: ${title}
@@ -52,64 +58,51 @@ Score: ${score} (${upvoteRatio ? Math.round(upvoteRatio * 100) : 'N/A'}% upvoted
 TOP COMMENTS:
 ${commentsText}
 
-Provide analysis in this format:
-**Discussion Summary:** [Main points, insights, key arguments]
-**Community Sentiment:** [Reception, debates, consensus/disagreement, overall mood]
+Respond in this exact format:
+**Discussion Summary:** <Main points, insights, key arguments>
+**Community Sentiment:** <Reception, debates, consensus/disagreement, overall mood>`;
 
-Focus on the discussion dynamics and community insights.`;
-
-    return await this.callGeminiCLI(prompt);
+    return await this.callLLM(prompt);
   }
 
-  async callGeminiCLI(prompt) {
-    let tempFile = null;
-    
+  async callLLM(prompt) {
+    console.log('\n⚡ LLM CALL STARTED:');
+    console.log(`   - Prompt received: ${prompt ? 'Yes' : 'No'}`);
+    console.log(`   - Prompt length: ${prompt ? prompt.length : 0} chars`);
+
+    if (!this.openai) {
+      console.warn('   ⚠️ OPENAI_API_KEY not set. Using mock response.');
+      return this.getMockResponse(prompt);
+    }
+
     try {
-      // Check if gemini is available
-      const testCommand = 'which gemini';
-      await execAsync(testCommand);
-      
-      // Create temporary file for the prompt to avoid shell escaping issues
-      tempFile = path.join(os.tmpdir(), `gemini_prompt_${Date.now()}.txt`);
-      await fs.writeFile(tempFile, prompt, 'utf8');
-      
-      // Use cat to pipe the file content to gemini
-      const command = `cat "${tempFile}" | gemini`;
-      
-      const { stdout, stderr } = await execAsync(command, {
-        timeout: this.defaultTimeout,
-        maxBuffer: 1024 * 1024 // 1MB buffer
+      const response = await this.openai.chat.completions.create({
+        model: this.model,
+        temperature: 0.3,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a concise, reliable content summarizer. Always follow the requested headings and be factual.'
+          },
+          { role: 'user', content: prompt }
+        ]
       });
 
-      if (stderr && !stderr.includes('Warning') && !stderr.includes('failed to start or connect to MCP')) {
-        console.warn('Gemini CLI warning:', stderr);
+      const text = response.choices?.[0]?.message?.content?.trim();
+      if (!text) {
+        throw new Error('Empty response from LLM');
       }
 
-      return this.parseGeminiResponse(stdout.trim());
+      return this.parseGeminiResponse(text);
     } catch (error) {
-      console.error('Gemini CLI error:', error.message);
-      
-      // Return mock response for testing when gemini is not available
-      if (error.message.includes('gemini') || error.code === 'ENOENT') {
-        return this.getMockResponse(prompt);
-      }
-      
+      console.error('❌ LLM API error:', error.message);
       return this.getFallbackResponse(error);
-    } finally {
-      // Clean up temporary file
-      if (tempFile) {
-        try {
-          await fs.unlink(tempFile);
-        } catch (cleanupError) {
-          console.warn('Failed to cleanup temp file:', cleanupError.message);
-        }
-      }
     }
   }
 
   getMockResponse(prompt) {
     // Generate mock responses based on content type
-    if (prompt.includes('YouTube video')) {
+    if (prompt.includes('YouTube') || prompt.includes('TOP VIEWER COMMENTS')) {
       return {
         summary: 'This educational video covers advanced concepts in mathematics and visualization, providing clear explanations with practical examples. The content is well-structured and suitable for intermediate to advanced learners.',
         sentiment: 'Positive - Viewers appreciate the clear explanations and visual approach. Many comments request follow-up videos and praise the teaching methodology.',

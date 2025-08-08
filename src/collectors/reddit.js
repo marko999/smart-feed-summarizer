@@ -1,12 +1,10 @@
 const BaseCollector = require('./base');
-const GeminiAnalyzer = require('../ai/gemini');
 // Using feeds.json now instead of sources.json
 
 class RedditCollector extends BaseCollector {
   constructor() {
     super();
     this.baseUrl = 'https://www.reddit.com';
-    this.gemini = new GeminiAnalyzer();
     // Config now passed per-feed instead of global
   }
 
@@ -58,31 +56,10 @@ class RedditCollector extends BaseCollector {
     
     // Get top comments for analysis
     let topComments = [];
-    if (this.config.includeComments) {
+    if (feedConfig.includeComments) {
       topComments = await this.getTopCommentsForAnalysis(postData.permalink);
     }
 
-    // Generate AI analysis using Gemini
-    let aiAnalysis = null;
-    try {
-      const postAnalysisData = {
-        title: postData.title,
-        selftext: postData.selftext || '',
-        subreddit: postData.subreddit,
-        score: postData.score,
-        upvoteRatio: postData.upvote_ratio,
-        comments: topComments,
-        url: postData.url
-      };
-      
-      aiAnalysis = await this.gemini.analyzeRedditPost(
-        postAnalysisData,
-        this.config.summaryLength
-      );
-    } catch (error) {
-      console.error(`Error generating AI analysis for ${postData.title}:`, error.message);
-    }
-    
     return {
       type: 'reddit',
       title: postData.title,
@@ -105,9 +82,7 @@ class RedditCollector extends BaseCollector {
       content: content,
       tags: this.extractTags(postData),
       comments: topComments,
-      aiSummary: aiAnalysis?.summary || 'AI summary not available',
-      communitySentiment: aiAnalysis?.sentiment || 'Sentiment analysis not available',
-      aiAnalysisTimestamp: aiAnalysis?.timestamp
+      // AI summary will be added by AISummarizer later
     };
   }
 

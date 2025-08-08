@@ -1,6 +1,5 @@
 const BaseCollector = require('./base');
 const Parser = require('rss-parser');
-const GeminiAnalyzer = require('../ai/gemini');
 // Using feeds.json now instead of sources.json
 
 class YouTubeCollector extends BaseCollector {
@@ -16,7 +15,6 @@ class YouTubeCollector extends BaseCollector {
         ]
       }
     });
-    this.gemini = new GeminiAnalyzer();
     // Config now passed per-feed instead of global
   }
 
@@ -61,23 +59,11 @@ class YouTubeCollector extends BaseCollector {
     
     // Get comments if enabled
     let comments = [];
-    if (this.config.includeComments) {
+    if (feedConfig.includeComments) {
       comments = await this.getVideoComments(videoId);
     }
 
-    // Generate AI summary using Gemini
-    let aiAnalysis = null;
-    try {
-      aiAnalysis = await this.gemini.analyzeYouTubeVideo(
-        item.link, 
-        comments, 
-        this.config.summaryLength
-      );
-    } catch (error) {
-      console.error(`Error generating AI summary for ${item.title}:`, error.message);
-    }
-
-    // Note: Using Gemini AI analysis instead of transcripts
+    // Note: Summary is generated later by AISummarizer
 
     return {
       type: 'youtube',
@@ -93,13 +79,11 @@ class YouTubeCollector extends BaseCollector {
       viewCount: videoData.viewCount,
       likeCount: videoData.likeCount,
       commentCount: videoData.commentCount,
-      transcript: '', // Not using transcripts - relying on Gemini analysis
+      transcript: '',
       tags: videoData.tags || [],
       category: videoData.category,
       comments: comments,
-      aiSummary: aiAnalysis?.summary || 'AI summary not available',
-      audienceReaction: aiAnalysis?.sentiment || 'Sentiment analysis not available',
-      aiAnalysisTimestamp: aiAnalysis?.timestamp
+      // AI summary will be added by AISummarizer later
     };
   }
 
@@ -170,7 +154,7 @@ class YouTubeCollector extends BaseCollector {
       // Return top comments based on configuration
       return mockComments
         .sort((a, b) => b.likes - a.likes)
-        .slice(0, this.config.maxComments);
+        .slice(0, 5); // Default to 5 comments
         
     } catch (error) {
       console.error(`Error getting comments for video ${videoId}:`, error);

@@ -8,55 +8,42 @@ class AISummarizer {
     
     this.maxSummaryLength = parseInt(process.env.SUMMARY_MAX_LENGTH) || 300;
     this.maxContentLength = parseInt(process.env.CONTENT_MAX_LENGTH) || 4000;
+    this.model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   }
 
   async summarizeItem(item) {
     try {
       console.log(`🤖 Summarizing: ${item.title.substring(0, 50)}...`);
+      console.log(`   - Type: ${item.type}`);
+      console.log(`   - URL: ${item.url || item.link || ''}`);
       
-      // Use Gemini analysis if available (for YouTube and Reddit)
-      if (item.aiSummary && item.aiSummary !== 'AI summary not available') {
-        const geminiSummary = this.formatGeminiSummary(item);
+      if (!this.openai) {
+        console.log(`   ❌ OPENAI_API_KEY not set`);
         return {
           ...item,
-          summary: geminiSummary,
-          summaryMethod: 'gemini',
-          summaryLength: geminiSummary.length
+          summary: 'AI summary not available (no API key configured).',
+          summaryMethod: 'unavailable',
+          summaryLength: 0
         };
       }
       
-      // Prepare content for summarization
-      const content = this.prepareContent(item);
-      
-      // Try AI summarization first
-      if (this.openai && content.length > 100) {
-        try {
-          const aiSummary = await this.generateAISummary(item, content);
-          if (aiSummary) {
-            return {
-              ...item,
-              summary: aiSummary,
-              summaryMethod: 'ai',
-              summaryLength: aiSummary.length
-            };
-          }
-        } catch (error) {
-          console.error('AI summarization failed, falling back to extractive:', error.message);
-        }
-      }
-      
-      // Fallback to extractive summarization
-      const extractiveSummary = this.generateExtractiveSummary(content, item.type);
+      console.log(`   🔄 Calling OpenAI to summarize via URL/context...`);
+      const summary = await this.generateAISummary(item);
+      const finalSummary = summary.length > this.maxSummaryLength
+        ? summary.substring(0, this.maxSummaryLength - 3) + '...'
+        : summary;
       
       return {
         ...item,
-        summary: extractiveSummary,
-        summaryMethod: 'extractive',
-        summaryLength: extractiveSummary.length
+        summary: finalSummary,
+        summaryMethod: 'ai',
+        summaryLength: finalSummary.length
       };
-      
     } catch (error) {
-      console.error(`Error summarizing ${item.title}:`, error);
+      console.error(`❌ Error summarizing ${item.title}:`, error);
+      console.error(`   - Error type: ${error.constructor.name}`);
+      console.error(`   - Error message: ${error.message}`);
+      console.error(`   - Stack trace:`, error.stack);
       return {
         ...item,
         summary: 'Summary generation failed',
@@ -66,239 +53,98 @@ class AISummarizer {
     }
   }
 
-  formatGeminiSummary(item) {
-    // Combine Gemini AI summary with sentiment analysis for a comprehensive summary
-    let summary = item.aiSummary;
-    
-    // Add sentiment/reaction if available and different from default
-    const sentiment = item.audienceReaction || item.communitySentiment;
-    if (sentiment && 
-        sentiment !== 'Sentiment analysis not available' &&
-        sentiment !== 'Unable to analyze sentiment') {
-      summary += ` ${sentiment}`;
-    }
-    
-    // Ensure summary isn't too long
-    if (summary.length > this.maxSummaryLength) {
-      summary = summary.substring(0, this.maxSummaryLength - 3) + '...';
-    }
-    
-    return summary;
-  }
+  // Removed Gemini formatting path; summaries are always generated via OpenAI when configured.
 
-  async generateAISummary(item, content) {
-    const prompt = this.buildPrompt(item, content);
-    
+  async generateAISummary(item) {
     try {
+      const url = item.url || item.link || '';
+      const contentContext = this.buildContextForItem(item);
+      const targetWords = Math.max(120, Math.min(220, Math.round(this.maxSummaryLength / 1.5)));
+
+      const userPrompt = `Summarize the content at the following URL using the provided context. If the URL cannot be fetched, infer from title and context. Keep it focused, factual, and helpful for a newsletter digest. Aim for about ${targetWords} words. End with one short takeaway.
+
+URL: ${url}
+Title: ${item.title}
+
+Context (may include description, tags, or top comments):
+${contentContext}
+
+Respond with just the summary text.`;
+
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: this.model,
+        temperature: 0.4,
         messages: [
           {
             role: 'system',
-            content: 'You are an expert content summarizer. Create concise, informative summaries that capture the key points and value of the content. Focus on what makes this content interesting and worth reading/watching.'
+            content: 'You are an expert newsletter editor. Be concise, concrete, and faithful to the source.'
           },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: Math.ceil(this.maxSummaryLength / 3), // Rough token estimate
-        temperature: 0.7,
-        presence_penalty: 0.1,
-        frequency_penalty: 0.1
+          { role: 'user', content: userPrompt }
+        ]
       });
-      
-      const summary = response.choices[0].message.content.trim();
-      
-      // Ensure summary isn't too long
-      return summary.length > this.maxSummaryLength 
-        ? summary.substring(0, this.maxSummaryLength - 3) + '...'
-        : summary;
-        
+
+      const text = response.choices?.[0]?.message?.content?.trim();
+      if (!text) throw new Error('Empty AI summary');
+      return text;
     } catch (error) {
-      console.error('OpenAI API error:', error);
-      throw error;
+      console.error('❌ OpenAI summarize error:', error.message);
+      return 'Summary unavailable due to AI service error.';
     }
   }
 
-  buildPrompt(item, content) {
-    const contentType = item.type === 'youtube' ? 'video' : 'post';
-    const source = item.type === 'youtube' ? item.channelName : `r/${item.subreddit}`;
-    
-    let prompt = `Summarize this ${contentType} from ${source} in 2-3 sentences:\n\n`;
-    prompt += `Title: ${item.title}\n\n`;
-    
-    if (item.description) {
-      prompt += `Description: ${item.description}\n\n`;
+  buildContextForItem(item) {
+    try {
+      const parts = [];
+      if (item.description) parts.push(this.limitText(this.normalizeWhitespace(item.description), this.maxContentLength / 3));
+      if (Array.isArray(item.tags) && item.tags.length > 0) parts.push(`Tags: ${item.tags.slice(0, 10).join(', ')}`);
+      if (Array.isArray(item.comments) && item.comments.length > 0) {
+        const formatted = item.comments
+          .slice(0, 5)
+          .map(c => `- ${(c.text || c.body || '').toString().slice(0, 180)} (${c.likes || c.score || 0} votes)`) 
+          .join('\n');
+        parts.push(`Top comments:\n${formatted}`);
+      }
+      return parts.join('\n\n');
+    } catch {
+      return '';
     }
-    
-    if (content && content.length > 50) {
-      prompt += `Content: ${content}\n\n`;
-    }
-    
-    // Add context based on type
-    if (item.type === 'youtube') {
-      prompt += `Focus on: What is this video about? What will viewers learn or gain from watching it?\n`;
-    } else if (item.type === 'reddit') {
-      prompt += `Focus on: What is being discussed? What are the key points or insights?\n`;
-    }
-    
-    prompt += `\nProvide a concise summary that explains why this content is interesting and valuable.`;
-    
-    return prompt;
   }
 
-  generateExtractiveSummary(content, type) {
-    if (!content || content.length < 50) {
-      return 'Content too short to summarize effectively.';
-    }
-    
-    // Clean and prepare content
-    const cleanContent = this.cleanContent(content);
-    
-    // Split into sentences
-    const sentences = this.splitIntoSentences(cleanContent);
-    
-    if (sentences.length === 0) {
-      return 'No meaningful content found for summarization.';
-    }
-    
-    // Score sentences
-    const scoredSentences = this.scoreSentences(sentences, type);
-    
-    // Select top sentences
-    const topSentences = scoredSentences
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
-      .sort((a, b) => a.index - b.index) // Restore original order
-      .map(s => s.sentence);
-    
-    let summary = topSentences.join(' ');
-    
-    // Ensure summary isn't too long
-    if (summary.length > this.maxSummaryLength) {
-      summary = summary.substring(0, this.maxSummaryLength - 3) + '...';
-    }
-    
-    return summary || 'Unable to generate meaningful summary.';
+  limitText(text, max) {
+    if (!text) return '';
+    const clean = this.normalizeWhitespace(text);
+    return clean.length > max ? clean.slice(0, max) + '…' : clean;
   }
 
-  cleanContent(content) {
-    return content
-      .replace(/\[.*?\]/g, '') // Remove [brackets]
-      .replace(/\(.*?\)/g, '') // Remove (parentheses) 
-      .replace(/https?:\/\/[^\s]+/g, '') // Remove URLs
-      .replace(/\s+/g, ' ') // Normalize whitespace
-      .trim();
+  normalizeWhitespace(text) {
+    return (text || '').replace(/\s+/g, ' ').trim();
   }
 
-  splitIntoSentences(content) {
-    return content
-      .split(/[.!?]+/)
-      .map(s => s.trim())
-      .filter(s => s.length > 20 && s.length < 200) // Reasonable sentence length
-      .filter(s => !this.isLowQualitySentence(s));
-  }
-
-  isLowQualitySentence(sentence) {
-    const lowQualityPatterns = [
-      /^(um|uh|like|you know)/i,
-      /^(thanks|thank you)/i,
-      /^(subscribe|like|comment)/i,
-      /^(edit|update):/i,
-      /^\d+\./  // Numbered lists
-    ];
-    
-    return lowQualityPatterns.some(pattern => pattern.test(sentence));
-  }
-
-  scoreSentences(sentences, type) {
-    const keywords = this.getRelevantKeywords(type);
-    
-    return sentences.map((sentence, index) => {
-      let score = 0;
-      const lowerSentence = sentence.toLowerCase();
-      
-      // Position score (earlier sentences often more important)
-      score += Math.max(0, 1 - (index / sentences.length)) * 0.3;
-      
-      // Length score (prefer medium-length sentences)
-      const idealLength = 80;
-      const lengthScore = 1 - Math.abs(sentence.length - idealLength) / idealLength;
-      score += Math.max(0, lengthScore) * 0.2;
-      
-      // Keyword score
-      let keywordScore = 0;
-      keywords.forEach(keyword => {
-        if (lowerSentence.includes(keyword.toLowerCase())) {
-          keywordScore += 0.1;
-        }
-      });
-      score += Math.min(keywordScore, 0.5);
-      
-      // Avoid questions and incomplete thoughts
-      if (sentence.endsWith('?')) score -= 0.1;
-      if (sentence.length < 30) score -= 0.2;
-      
-      return {
-        sentence,
-        score,
-        index
-      };
-    });
-  }
-
-  getRelevantKeywords(type) {
-    const commonKeywords = [
-      'research', 'study', 'analysis', 'data', 'results', 'findings',
-      'important', 'significant', 'key', 'main', 'primary', 'major',
-      'new', 'innovative', 'breakthrough', 'discovery', 'development'
-    ];
-    
-    if (type === 'youtube') {
-      return [...commonKeywords, 'explains', 'shows', 'demonstrates', 'teaches', 'covers'];
-    } else if (type === 'reddit') {
-      return [...commonKeywords, 'discusses', 'argues', 'points out', 'suggests', 'claims'];
-    }
-    
-    return commonKeywords;
-  }
-
-  prepareContent(item) {
-    let content = '';
-    
-    // Add description
-    if (item.description) {
-      content += item.description + ' ';
-    }
-    
-    // Add transcript for YouTube
-    if (item.type === 'youtube' && item.transcript) {
-      content += item.transcript + ' ';
-    }
-    
-    // Add post content for Reddit
-    if (item.type === 'reddit' && item.content) {
-      content += item.content + ' ';
-    }
-    
-    // Limit content length
-    return content.substring(0, this.maxContentLength);
-  }
 
   // Batch summarization for efficiency
   async summarizeItems(items) {
+    console.log(`\n🔄 Starting batch summarization of ${items.length} items...`);
     const summaries = [];
     
-    for (const item of items) {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
       try {
+        console.log(`\n📋 Processing item ${i + 1}/${items.length}:`);
+        console.log(`   - Title: ${item.title}`);
+        console.log(`   - Type: ${item.type}`);
+        console.log(`   - URL: ${item.url}`);
+        
         const summarizedItem = await this.summarizeItem(item);
         summaries.push(summarizedItem);
+        
+        console.log(`   ✅ Item ${i + 1} completed with method: ${summarizedItem.summaryMethod}`);
         
         // Small delay to avoid rate limiting
         await this.delay(100);
       } catch (error) {
-        console.error(`Error in batch summarization for ${item.title}:`, error);
+        console.error(`❌ Error in batch summarization for ${item.title}:`, error);
+        console.error(`   - Batch item ${i + 1}/${items.length}`);
+        console.error(`   - Error details:`, error.stack);
         summaries.push({
           ...item,
           summary: 'Summarization failed',
@@ -307,6 +153,7 @@ class AISummarizer {
       }
     }
     
+    console.log(`\n✅ Batch summarization completed. ${summaries.length} items processed.`);
     return summaries;
   }
 

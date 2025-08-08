@@ -374,7 +374,7 @@ app.listen(PORT, () => {
     console.log(`\n🧠 Smart Feed Summarizer`);
     console.log(`🌐 Server running on http://localhost:${PORT}`);
     console.log(`📅 Update schedule: ${updateSchedule}`);
-    console.log(`🔑 AI summarization: ${process.env.OPENAI_API_KEY ? 'Enabled' : 'Disabled (using Gemini)'}`);
+    console.log(`🔑 AI summarization: ${process.env.OPENAI_API_KEY ? 'Enabled' : 'Disabled'}`);
     console.log(`\n💡 Ready to collect! Click "Refresh Feeds" in the dashboard to start.`);
     console.log(`📊 Dashboard: http://localhost:${PORT}`);
 });
