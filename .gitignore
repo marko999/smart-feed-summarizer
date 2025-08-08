@@ -104,4 +104,4 @@ build/
 
 # Backup files
 *.backup
-*.bak
+*.baknode_modules/
