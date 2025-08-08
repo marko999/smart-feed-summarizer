@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Smart Feed Summarizer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <h1>🧠 Smart Feed Summarizer</h1>
+                        <p>AI-powered content curation from your favorite sources</p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="preview-btn" class="btn btn-primary">
+                            <span class="btn-icon">👁️</span>
+                            Preview & Select
+                        </button>
+                        <button id="refresh-btn" class="btn btn-secondary">
+                            <span class="btn-icon">🔄</span>
+                            Quick Refresh
+                        </button>
+                        <button id="settings-btn" class="btn btn-secondary">
+                            <span class="btn-icon">⚙️</span>
+                            Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="container">
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <span class="stat-label">Last Updated:</span>
+                        <span id="last-updated" class="stat-value">Never</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Items:</span>
+                        <span id="total-items" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">AI Summaries:</span>
+                        <span id="ai-summaries" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="container">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All Content</button>
+                    <button class="filter-tab" data-filter="youtube">🎥 YouTube</button>
+                    <button class="filter-tab" data-filter="reddit">🔴 Reddit</button>
+                </div>
+                <div class="filter-controls">
+                    <select id="sort-select" class="filter-select">
+                        <option value="score">Sort by Score</option>
+                        <option value="date">Sort by Date</option>
+                        <option value="engagement">Sort by Engagement</option>
+                    </select>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search content...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading-state" style="display: none;">
+            <div class="container">
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <h3>Collecting and analyzing content...</h3>
+                    <p>This may take a few moments while we gather the best content from your feeds.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- YouTube Section -->
+                <section id="youtube-section" class="content-section">
+                    <div class="section-header">
+                        <h2>🎥 YouTube Videos</h2>
+                        <div class="section-stats">
+                            <span id="youtube-count" class="count-badge">0</span>
+                        </div>
+                    </div>
+                    <div id="youtube-grid" class="content-grid">
+                        <!-- YouTube items will be inserted here -->
+                    </div>
+                </section>
+
+                <!-- Reddit Section -->
+                <section id="reddit-section" class="content-section">
+                    <div class="section-header">
+                        <h2>🔴 Reddit Posts</h2>
+                        <div class="section-stats">
+                            <span id="reddit-count" class="count-badge">0</span>
+                        </div>
+                    </div>
+                    <div id="reddit-grid" class="content-grid">
+                        <!-- Reddit items will be inserted here -->
+                    </div>
+                </section>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <div class="empty-content">
+                        <div class="empty-icon">📭</div>
+                        <h3>No content available</h3>
+                        <p>Click "Refresh Feeds" to collect the latest content from your configured sources.</p>
+                        <button id="empty-refresh-btn" class="btn btn-primary">
+                            <span class="btn-icon">🔄</span>
+                            Refresh Feeds
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-info">
+                        <p>Smart Feed Summarizer - Powered by AI</p>
+                        <p class="footer-note">Curating the best content from your favorite sources</p>
+                    </div>
+                    <div class="footer-actions">
+                        <button id="export-btn" class="btn btn-outline">
+                            <span class="btn-icon">📥</span>
+                            Export Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="modal preview-modal" style="display: none;">
+        <div class="modal-content preview-modal-content">
+            <div class="modal-header">
+                <h3>📋 Content Preview & Selection</h3>
+                <div class="preview-stats">
+                    <span id="preview-total">0</span> items • 
+                    <span id="preview-selected">0</span> selected
+                </div>
+                <button id="close-preview" class="modal-close">&times;</button>
+            </div>
+            
+            <div class="preview-controls">
+                <div class="preview-filters">
+                    <button class="preview-filter active" data-category="all">All (<span class="count">0</span>)</button>
+                    <button class="preview-filter" data-category="AI/ML">🤖 AI/ML (<span class="count">0</span>)</button>
+                    <button class="preview-filter" data-category="Technology">💻 Tech (<span class="count">0</span>)</button>
+                    <button class="preview-filter" data-category="Science/Math">🧮 Science (<span class="count">0</span>)</button>
+                    <button class="preview-filter" data-category="Culture/Entertainment">🎬 Culture (<span class="count">0</span>)</button>
+                    <button class="preview-filter" data-category="Business/Economics">💼 Business (<span class="count">0</span>)</button>
+                    <button class="preview-filter" data-category="News/Media">📰 News (<span class="count">0</span>)</button>
+                    <button class="preview-filter" data-category="Technical Specialties">🔒 Technical (<span class="count">0</span>)</button>
+                </div>
+                
+                <div class="preview-actions">
+                    <button id="select-all-btn" class="btn btn-outline btn-small">Select All Visible</button>
+                    <button id="clear-selection-btn" class="btn btn-outline btn-small">Clear Selection</button>
+                    <button id="auto-select-btn" class="btn btn-outline btn-small">Smart Select</button>
+                </div>
+            </div>
+            
+            <div class="modal-body preview-body">
+                <div id="preview-loading" class="preview-loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Loading content previews...</p>
+                </div>
+                
+                <div id="preview-grid" class="preview-grid">
+                    <!-- Preview items will be inserted here -->
+                </div>
+                
+                <div id="preview-empty" class="preview-empty" style="display: none;">
+                    <p>No items match the current filter.</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="footer-stats">
+                    <span id="selection-summary">No items selected</span>
+                </div>
+                <div class="footer-actions">
+                    <button id="cancel-preview" class="btn btn-secondary">Cancel</button>
+                    <button id="summarize-selected" class="btn btn-primary" disabled>
+                        <span class="btn-icon">🧠</span>
+                        Summarize Selected (<span id="selected-count">0</span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button id="close-settings" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Content Distribution Settings -->
+                <div class="setting-section">
+                    <h4>📊 Content Distribution</h4>
+                    <p class="setting-description">Adjust how many summaries you want from each category (0-5)</p>
+                    
+                    <div class="category-controls">
+                        <div class="category-slider">
+                            <div class="category-header">
+                                <span class="category-icon">🤖</span>
+                                <label>AI/ML</label>
+                                <span id="aiml-value" class="category-value">5</span>
+                            </div>
+                            <input type="range" id="aiml-slider" class="slider" min="0" max="5" value="5">
+                        </div>
+
+                        <div class="category-slider">
+                            <div class="category-header">
+                                <span class="category-icon">💻</span>
+                                <label>Technology</label>
+                                <span id="tech-value" class="category-value">2</span>
+                            </div>
+                            <input type="range" id="tech-slider" class="slider" min="0" max="5" value="2">
+                        </div>
+
+                        <div class="category-slider">
+                            <div class="category-header">
+                                <span class="category-icon">🧮</span>
+                                <label>Science/Math</label>
+                                <span id="science-value" class="category-value">1</span>
+                            </div>
+                            <input type="range" id="science-slider" class="slider" min="0" max="5" value="1">
+                        </div>
+
+                        <div class="category-slider">
+                            <div class="category-header">
+                                <span class="category-icon">🎬</span>
+                                <label>Culture/Entertainment</label>
+                                <span id="culture-value" class="category-value">3</span>
+                            </div>
+                            <input type="range" id="culture-slider" class="slider" min="0" max="5" value="3">
+                        </div>
+
+                        <div class="category-slider">
+                            <div class="category-header">
+                                <span class="category-icon">💼</span>
+                                <label>Business/Economics</label>
+                                <span id="business-value" class="category-value">3</span>
+                            </div>
+                            <input type="range" id="business-slider" class="slider" min="0" max="5" value="3">
+                        </div>
+
+                        <div class="category-slider">
+                            <div class="category-header">
+                                <span class="category-icon">📰</span>
+                                <label>News/Media</label>
+                                <span id="news-value" class="category-value">3</span>
+                            </div>
+                            <input type="range" id="news-slider" class="slider" min="0" max="5" value="3">
+                        </div>
+
+                        <div class="category-slider">
+                            <div class="category-header">
+                                <span class="category-icon">🔒</span>
+                                <label>Technical Specialties</label>
+                                <span id="technical-value" class="category-value">2</span>
+                            </div>
+                            <input type="range" id="technical-slider" class="slider" min="0" max="5" value="2">
+                        </div>
+                    </div>
+
+                    <div class="distribution-summary">
+                        <p>Total summaries: <span id="total-summaries">19</span></p>
+                        <button id="reset-defaults" class="btn btn-outline btn-small">Reset to Defaults</button>
+                    </div>
+                </div>
+
+                <!-- Existing Settings -->
+                <div class="setting-section">
+                    <h4>⚙️ General Settings</h4>
+                    
+                    <div class="setting-group">
+                        <label>Update Frequency</label>
+                        <select id="update-frequency">
+                            <option value="1">Every hour</option>
+                            <option value="6" selected>Every 6 hours</option>
+                            <option value="12">Every 12 hours</option>
+                            <option value="24">Daily</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Items per Feed</label>
+                        <input type="number" id="items-per-feed" value="3" min="1" max="10">
+                    </div>
+                    <div class="setting-group">
+                        <label>AI Summarization</label>
+                        <input type="checkbox" id="ai-enabled" checked>
+                        <span>Enable AI-powered summaries (requires API key)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings" class="btn btn-primary">Save Settings</button>
+                <button id="cancel-settings" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

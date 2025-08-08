@@ -1,0 +1,36 @@
+{
+  "interests": [
+    "artificial intelligence",
+    "machine learning",
+    "deep learning",
+    "neural networks",
+    "mathematics",
+    "algorithms",
+    "programming",
+    "software development",
+    "data science",
+    "computer vision",
+    "natural language processing",
+    "research papers",
+    "technology trends",
+    "innovation",
+    "automation"
+  ],
+  "keywords": {
+    "high_priority": [
+      "AI", "ML", "GPT", "transformer", "neural", "algorithm", "breakthrough",
+      "research", "paper", "study", "mathematics", "proof", "theorem"
+    ],
+    "medium_priority": [
+      "programming", "code", "development", "software", "tech", "innovation",
+      "startup", "data", "analysis", "visualization", "education"
+    ],
+    "low_priority": [
+      "tutorial", "beginner", "introduction", "basics", "overview"
+    ]
+  },
+  "exclude_keywords": [
+    "clickbait", "drama", "controversy", "gossip", "celebrity",
+    "politics", "religion", "spam", "advertisement"
+  ]
+}

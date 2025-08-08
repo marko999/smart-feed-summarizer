@@ -1,0 +1,457 @@
+{
+  "youtube": [
+    {
+      "channelId": "UCYO_jab_esuFRV4b17AJtAw",
+      "name": "3Blue1Brown",
+      "topics": [
+        "mathematics",
+        "visualization",
+        "education",
+        "algorithms"
+      ],
+      "weight": 0.4,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCYO_jab_esuFRV4b17AJtAw"
+    },
+    {
+      "channelId": "UCbfYPyITQ-7l4upoX8nvctg",
+      "name": "Two Minute Papers",
+      "topics": [
+        "AI",
+        "machine learning",
+        "research",
+        "papers"
+      ],
+      "weight": 1.3,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCbfYPyITQ-7l4upoX8nvctg"
+    },
+    {
+      "channelId": "UC1_uAIS3r8Vu6JjXWvastJg",
+      "name": "Mathologer",
+      "topics": [
+        "mathematics",
+        "puzzles",
+        "proofs"
+      ],
+      "weight": 0.3,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC1_uAIS3r8Vu6JjXWvastJg"
+    },
+    {
+      "channelId": "UCoxcjq-8xIDTYp3uz647V5A",
+      "name": "Numberphile",
+      "topics": [
+        "mathematics",
+        "numbers",
+        "education"
+      ],
+      "weight": 0.4,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCoxcjq-8xIDTYp3uz647V5A"
+    },
+    {
+      "channelId": "UCuFFtHWoLl5fauMMD5Ww2jA",
+      "name": "CBC News",
+      "topics": [
+        "news",
+        "current events",
+        "journalism"
+      ],
+      "weight": 1.2,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCuFFtHWoLl5fauMMD5Ww2jA"
+    },
+    {
+      "channelId": "UC4QZ_LsYcvcq7qOsOhpAX4A",
+      "name": "ColdFusion",
+      "topics": [
+        "technology",
+        "business",
+        "documentary"
+      ],
+      "weight": 0.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC4QZ_LsYcvcq7qOsOhpAX4A"
+    },
+    {
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "name": "Fireship",
+      "topics": [
+        "programming",
+        "web development",
+        "tutorials"
+      ],
+      "weight": 0.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCsBjURrPoezykLs9EqgamOA"
+    },
+    {
+      "channelId": "UCLXo7UDZvByw2ixzpQCufnA",
+      "name": "Vox",
+      "topics": [
+        "culture",
+        "analysis",
+        "explainers"
+      ],
+      "weight": 1.2,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCLXo7UDZvByw2ixzpQCufnA"
+    },
+    {
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "name": "Linus Tech Tips",
+      "topics": [
+        "technology",
+        "hardware",
+        "reviews"
+      ],
+      "weight": 0.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
+    },
+    {
+      "channelId": "UCNJ1Ymd5yFuUPtn21xtRbbw",
+      "name": "AI Explained",
+      "topics": [
+        "AI",
+        "machine learning",
+        "artificial intelligence"
+      ],
+      "weight": 1.4,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCNJ1Ymd5yFuUPtn21xtRbbw"
+    },
+    {
+      "channelId": "UC16niRr50-MSBwiO3YDb3RA",
+      "name": "BBC News",
+      "topics": [
+        "news",
+        "current events",
+        "journalism"
+      ],
+      "weight": 1.2,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC16niRr50-MSBwiO3YDb3RA"
+    },
+    {
+      "channelId": "UCftwRNsjfRo08xYE31tkiyw",
+      "name": "WIRED",
+      "topics": [
+        "technology",
+        "innovation",
+        "science"
+      ],
+      "weight": 0.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCftwRNsjfRo08xYE31tkiyw"
+    },
+    {
+      "channelId": "UCddiUEpeqJcYeBxX1IVBKvQ",
+      "name": "The Verge",
+      "topics": [
+        "technology",
+        "gadgets",
+        "reviews"
+      ],
+      "weight": 0.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCddiUEpeqJcYeBxX1IVBKvQ"
+    },
+    {
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "name": "Veritasium",
+      "topics": [
+        "science",
+        "education",
+        "physics"
+      ],
+      "weight": 0.4,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCHnyfMqiRRG1u-2MsSQLbXA"
+    },
+    {
+      "channelId": "UCn8zNIfYAQNdrFRrr8oibKw",
+      "name": "VICE",
+      "topics": [
+        "news",
+        "documentaries",
+        "culture"
+      ],
+      "weight": 1.3,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCn8zNIfYAQNdrFRrr8oibKw"
+    },
+    {
+      "channelId": "UC7fWeaHhqgM4Ry-RMpM2YYw",
+      "name": "TRT World",
+      "topics": [
+        "international news",
+        "German media",
+        "current events"
+      ],
+      "weight": 1,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC7fWeaHhqgM4Ry-RMpM2YYw"
+    },
+    {
+      "channelId": "UCrDwWp7EBBv4NwvScIpBDOA",
+      "name": "Anthropic",
+      "topics": [
+        "AI",
+        "machine learning",
+        "artificial intelligence"
+      ],
+      "weight": 1.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrDwWp7EBBv4NwvScIpBDOA"
+    },
+    {
+      "channelId": "UCnCikd0s4i9KoDtaHPlK-JA",
+      "name": "Unsupervised Learning",
+      "topics": [
+        "AI",
+        "machine learning",
+        "data science"
+      ],
+      "weight": 1.4,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCnCikd0s4i9KoDtaHPlK-JA"
+    },
+    {
+      "channelId": "UC2WmuBuFq6gL08QYG-JjXKw",
+      "name": "WorldofAI",
+      "topics": [
+        "AI",
+        "machine learning",
+        "artificial intelligence"
+      ],
+      "weight": 1.4,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC2WmuBuFq6gL08QYG-JjXKw"
+    },
+    {
+      "channelId": "UCOCahKBCEUuzDJawM7yN1dg",
+      "name": "Bijan Bowen",
+      "topics": [
+        "technology",
+        "programming"
+      ],
+      "weight": 0.5,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCOCahKBCEUuzDJawM7yN1dg"
+    },
+    {
+      "channelId": "UCQd9wpBDkfQxqxGIBko2fKg",
+      "name": "GosuCoder",
+      "topics": [
+        "programming",
+        "coding",
+        "tutorials"
+      ],
+      "weight": 0.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQd9wpBDkfQxqxGIBko2fKg"
+    },
+    {
+      "channelId": "UChpleBmo18P08aKCIgti38g",
+      "name": "Matt Wolfe",
+      "topics": [
+        "AI",
+        "technology",
+        "reviews"
+      ],
+      "weight": 1.3,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UChpleBmo18P08aKCIgti38g"
+    },
+    {
+      "channelId": "UCw8h_jH2gB20wcZTJiaQNCA",
+      "name": "Hoops Tonight",
+      "topics": [
+        "sports",
+        "basketball",
+        "entertainment"
+      ],
+      "weight": 0.9,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCw8h_jH2gB20wcZTJiaQNCA"
+    },
+    {
+      "channelId": "UCsVgseBnKuyIGaH54XVoK3Q",
+      "name": "Rob Shocks",
+      "topics": [
+        "commentary",
+        "analysis",
+        "current events"
+      ],
+      "weight": 0.9,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCsVgseBnKuyIGaH54XVoK3Q"
+    },
+    {
+      "channelId": "UCXzw-OdotBUcNA9yhuYQBwA",
+      "name": "Awesome",
+      "topics": [
+        "programming",
+        "coding",
+        "tutorials"
+      ],
+      "weight": 0.6,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCXzw-OdotBUcNA9yhuYQBwA"
+    },
+    {
+      "channelId": "UCy71Sv5TVBbn5BYETRQV22Q",
+      "name": "Robin Ebers",
+      "topics": [
+        "programming",
+        "web development",
+        "tutorials"
+      ],
+      "weight": 0.5,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCy71Sv5TVBbn5BYETRQV22Q"
+    },
+    {
+      "channelId": "UCyNaCRf6Aaljcm9ZWARawXw",
+      "name": "RESPIRE",
+      "topics": [
+        "wellness",
+        "lifestyle",
+        "culture"
+      ],
+      "weight": 0.9,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCyNaCRf6Aaljcm9ZWARawXw"
+    },
+    {
+      "channelId": "UCGudGqToOw9hWGR88W9Jutg",
+      "name": "Howtown",
+      "topics": [
+        "culture",
+        "documentary",
+        "explainers"
+      ],
+      "weight": 1,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCGudGqToOw9hWGR88W9Jutg"
+    },
+    {
+      "channelId": "UCK0z0_5uL7mb9IjntOKi5XQ",
+      "name": "The Atlantic",
+      "topics": [
+        "culture",
+        "politics",
+        "analysis"
+      ],
+      "weight": 1,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCK0z0_5uL7mb9IjntOKi5XQ"
+    },
+    {
+      "channelId": "UC3_BakzLfadvFrsnClMFWmQ",
+      "name": "John Coogan",
+      "topics": [
+        "business",
+        "economics",
+        "commentary"
+      ],
+      "weight": 0.9,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC3_BakzLfadvFrsnClMFWmQ"
+    },
+    {
+      "channelId": "UCFTa6brqBD26IEPHJ_TILvA",
+      "name": "DW Fokus",
+      "topics": [
+        "international news",
+        "German media",
+        "current events"
+      ],
+      "weight": 1,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCFTa6brqBD26IEPHJ_TILvA"
+    },
+    {
+      "channelId": "UCJVXj8BvHykEklEeKjFwaXQ",
+      "name": "Micro",
+      "topics": [
+        "economics",
+        "finance",
+        "analysis"
+      ],
+      "weight": 0.9,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCJVXj8BvHykEklEeKjFwaXQ"
+    },
+    {
+      "channelId": "UCe4_UPAmhz2sqorGbF8oZHA",
+      "name": "Luke Stephens",
+      "topics": [
+        "cybersecurity",
+        "technology",
+        "hacking"
+      ],
+      "weight": 0.8,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCe4_UPAmhz2sqorGbF8oZHA"
+    },
+    {
+      "channelId": "UC1rFmaGLYr0Ve_Y_soxZNWQ",
+      "name": "Quinn's Ideas",
+      "topics": [
+        "commentary",
+        "analysis",
+        "discussion"
+      ],
+      "weight": 0.9,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC1rFmaGLYr0Ve_Y_soxZNWQ"
+    },
+    {
+      "channelId": "UCL9S_mHsL0ihkXQMh80WYtg",
+      "name": "Serop | AI Automation",
+      "topics": [
+        "AI",
+        "machine learning",
+        "artificial intelligence"
+      ],
+      "weight": 1.4,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCL9S_mHsL0ihkXQMh80WYtg"
+    },
+    {
+      "channelId": "UCErmMCK1sHF-kCtyHpuSXtQ",
+      "name": "Kermode and Mayo's Take",
+      "topics": [
+        "movies",
+        "film reviews",
+        "entertainment"
+      ],
+      "weight": 0.9,
+      "feedUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UCErmMCK1sHF-kCtyHpuSXtQ"
+    }
+  ],
+  "reddit": [
+    {
+      "subreddit": "MachineLearning",
+      "topics": [
+        "AI",
+        "ML",
+        "deep learning",
+        "research",
+        "papers"
+      ],
+      "weight": 1.3,
+      "feedUrl": "https://www.reddit.com/r/MachineLearning/hot.json"
+    },
+    {
+      "subreddit": "programming",
+      "topics": [
+        "coding",
+        "development",
+        "software",
+        "programming"
+      ],
+      "weight": 0.5,
+      "feedUrl": "https://www.reddit.com/r/programming/hot.json"
+    },
+    {
+      "subreddit": "technology",
+      "topics": [
+        "tech",
+        "innovation",
+        "startups",
+        "gadgets"
+      ],
+      "weight": 0.5,
+      "feedUrl": "https://www.reddit.com/r/technology/hot.json"
+    },
+    {
+      "subreddit": "artificial",
+      "topics": [
+        "AI",
+        "artificial intelligence",
+        "automation"
+      ],
+      "weight": 1.2,
+      "feedUrl": "https://www.reddit.com/r/artificial/hot.json"
+    },
+    {
+      "subreddit": "compsci",
+      "topics": [
+        "computer science",
+        "algorithms",
+        "theory"
+      ],
+      "weight": 0.3,
+      "feedUrl": "https://www.reddit.com/r/compsci/hot.json"
+    }
+  ]
+}
